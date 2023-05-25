@@ -3,7 +3,7 @@ import openCompilerController from "../controllers/controller";
 
 const router = express.Router();
 
-router.post("/api/openCompiler/key", openCompilerController.initCompiler);
-router.patch("/api/openCompiler", openCompilerController.compile);
+router.post("/", openCompilerController.initCompiler);
+router.patch("/", openCompilerController.compile);
 
 export default router;

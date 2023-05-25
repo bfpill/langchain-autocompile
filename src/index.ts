@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 //v1 api
-app.use("/api/v1/personalities", openCompileRouter);
+app.use("/api/v1/openCompiler", openCompileRouter);
 
 app.listen(PORT, () => {
   console.log(`API is listening on port ${PORT}`);
