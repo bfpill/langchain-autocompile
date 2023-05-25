@@ -1,4 +1,4 @@
-import openCompiler from "../../compiler/simulated/openCompiler"
+import openCompiler from "../../simulated/openCompiler"
 const compiler = new openCompiler;
 
 const init = async (key: string) =>{

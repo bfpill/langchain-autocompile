@@ -1,5 +1,5 @@
 {
-  "include": ["./src/**/*"],
+  "include": ["compiler/src/**/*"],
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"
