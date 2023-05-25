@@ -20,7 +20,6 @@ const initCompiler = async (req, res) => {
 
     const key = body.key;
     const result = await openCompilerServices.init(key);
-    console.log(result);
     res.send({ status: "OK", data: result });
 }
 
@@ -42,9 +41,8 @@ const compile = async (req, res) => {
         return;
     }
 
-    const input = body.key;
+    const input = body.input;
     const output = await openCompilerServices.compile(input);
-    console.log(output);
     res.send({ status: "OK", data: output });
 }
 

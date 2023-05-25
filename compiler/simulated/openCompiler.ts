@@ -1,9 +1,9 @@
 import { Configuration, OpenAIApi} from "openai"
 import { OpenAI } from "langchain/llms/openai";
 import { BasePromptTemplate, PromptTemplate } from "langchain/prompts";
-import { LLMChain, LLMChainInput } from "langchain/chains";
+import { ConversationChain, LLMChain, LLMChainInput } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
-import { log } from "console";
+import { BaseLanguageModel } from "langchain/dist/base_language";
 
 export default class OpenCompiler {
     initialized: boolean;
@@ -32,9 +32,10 @@ export default class OpenCompiler {
           console.log("Not initialized, running initalization");
           this.key = key;
     
-          this.prompt = await this.getPromptData();
-          this.memory = this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
-          this.chain = this.constructChain(this.prompt);
+          this.prompt = this.getPromptData();
+          this.memory = await this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
+          this.chain = this.constructChain(this.prompt, this.model, this.memory);
+          console.log("Initalization complete");
         }
     }
 
@@ -45,19 +46,19 @@ export default class OpenCompiler {
 
     getPromptData = () =>{
         return (
-            "You are a Python Compiler. Compile any code that you are given and return the output"
+            PromptTemplate.fromTemplate("You are a Python Compiler. Compile {code} and return the output")
         )
     }
 
-    constructChain = (prompt: BasePromptTemplate) => {
-        const memory = this.memory
-        const chain = new LLMChain({ llm: this.model, prompt, memory });
-        return chain
+    constructChain = (prompt: PromptTemplate, model: BaseLanguageModel, memory: any) => {
+        const chain = new ConversationChain({ prompt, llm: model, memory: memory });
+        return chain;
     }
 
-    public compile = async (input: any) => {
+    compile = async (input: any) => {
         if(this.chain !== undefined){
-            const res = await this.chain.call({ input: input});
+            console.log(input);
+            const res = await this.chain.call({ code: input});
             console.log(res);
             return res;
         } else{
