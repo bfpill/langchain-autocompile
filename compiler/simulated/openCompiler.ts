@@ -1,8 +1,9 @@
 import { Configuration, OpenAIApi} from "openai"
 import { OpenAI } from "langchain/llms/openai";
 import { BasePromptTemplate, PromptTemplate } from "langchain/prompts";
-import { LLMChain } from "langchain/chains";
+import { LLMChain, LLMChainInput } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
+import { log } from "console";
 
 export default class OpenCompiler {
     initialized: boolean;
@@ -32,8 +33,8 @@ export default class OpenCompiler {
           this.key = key;
     
           this.prompt = await this.getPromptData();
-          this.memory = await this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
-          this.chain = await this.constructChain(this.prompt);
+          this.memory = this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
+          this.chain = this.constructChain(this.prompt);
         }
     }
 
@@ -42,15 +43,25 @@ export default class OpenCompiler {
         return memory;
     }
 
+    getPromptData = () =>{
+        return (
+            "You are a Python Compiler. Compile any code that you are given and return the output"
+        )
+    }
+
     constructChain = (prompt: BasePromptTemplate) => {
         const memory = this.memory
         const chain = new LLMChain({ llm: this.model, prompt, memory });
         return chain
     }
 
-    getPromptData = () =>{
-        return (
-            "You are a Python Compiler. Compile any code that you are given and return the output"
-        )
+    public compile = async (input: any) => {
+        if(this.chain !== undefined){
+            const res = await this.chain.call({ input: input});
+            console.log(res);
+            return res;
+        } else{
+            return("Could not compile, compiler is not initialized")
+        }
     }
 }

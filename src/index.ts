@@ -1,17 +1,20 @@
 import express from 'express';
+import bodyParser from "body-parser";
 import * as dotenv from 'dotenv';
+import v1SimulatedCompileRouter from "../server/routes/v1SimulatedCompilerRouter"
 
 // Get environment variables
 dotenv.config() 
 
 // Express Server initialization
-const app = express();
-const port = 3000;
+const app = express(); 
+const PORT = process.env.PORT || 3000; 
 
-app.listen(port, () => {
-  console.log(`API listening on http://localhost:${port}`);
+app.use(bodyParser.json());
+
+//v1 api
+app.use("/api/v1/personalities", v1SimulatedCompileRouter);
+
+app.listen(PORT, () => {
+  console.log(`API is listening on port ${PORT}`);
 });
-
-app.get('/api/compiler', async (req, res) => {
-    // Code to generate answers to questions with OpenAI
-  });
