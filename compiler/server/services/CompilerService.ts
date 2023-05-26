@@ -41,8 +41,8 @@ class CompilerService {
     const code = fs.readFileSync(absolutePath, 'utf8');
 
     const output = await compiler.compile(code);
-    console.log("Output from compiler: " + output.response)
-    return output;
+    console.log(output.response)
+    return output.response;
   }
 }
 
