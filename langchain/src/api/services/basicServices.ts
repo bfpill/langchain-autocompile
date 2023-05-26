@@ -1,5 +1,5 @@
 import Agent from "../../agent/agent";
-
+import { run } from "../../agent/custom_agent"
 class BasicAgentService {
   agents = new Map();
 
@@ -27,6 +27,16 @@ class BasicAgentService {
     } catch(error){
         console.log(error)
         return(`Compiler not found for key: ${key}`)
+    }
+  }
+
+  async run() {
+    try{
+        const output = run();
+        return output;
+    } catch(error){
+        console.log(error)
+        return(error)
     }
   }
 }

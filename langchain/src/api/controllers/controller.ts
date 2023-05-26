@@ -45,7 +45,15 @@ const init = async (req: any, res: any) => {
     res.status(201).send({ status: "OK", data: {result} });
 };
 
+const run = async (req: any, res: any) => {
+    const result = await basicServices.run();
+
+    res.status(201).send({ status: "OK", data: {result} });
+};
+
+
 export default {
     newChatMessage,
-    init
+    init, 
+    run
 };
