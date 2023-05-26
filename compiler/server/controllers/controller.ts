@@ -1,5 +1,6 @@
 import CompilerService from "../services/CompilerService"
 
+
 const init = async (req, res) => {
   const { key, language } = req.body;
   try {
@@ -11,10 +12,11 @@ const init = async (req, res) => {
 };
 
 const compile = async (req, res) => {
-  const { key, input } = req.body;
+  const { key, code } = req.body;
+
   try {
-    const output = await CompilerService.compile(key, input);
-    res.status(200).json({ message: 'Compilation completed', output });
+    const output = await CompilerService.compile(key, code);
+    res.status(200).json({ message: 'Compilation comp aleted', output });
   } catch (error: any) {
     res.status(500).json({ message: 'Compilation failed', error: error.message });
   }

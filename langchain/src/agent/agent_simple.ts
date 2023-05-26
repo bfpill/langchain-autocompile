@@ -12,6 +12,7 @@ const compile = async (code: string) => {
     const url = "http://localhost:3000/api/v1/openCompiler";
     const key = "2";
 
+    console.log("Attemping to compile: " + code)
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -69,7 +70,8 @@ export const run = async () => {
   const executor = AgentExecutor.fromAgentAndTools({ agent, tools });
 
   const response = await executor.run(
-    `Wite python code that will print "cheese wheels" and respond with the output`
+    `Write python code that will make two number variables and then print their sum. 
+    Format your code to be one linie. Run your code using the compiler tool and respond with your output.`
   );
 
   console.log(response);
