@@ -4,10 +4,16 @@ class CompilerService {
   compilers = new Map();
 
   init(key: string, language: string) {
-    const compiler = new openCompiler();
-    compiler.init(key, language);
-    this.compilers.set(key, compiler);
-    return compiler;
+    if(!this.getCompiler(key)){
+        const compiler = new openCompiler();
+        compiler.init(key, language);
+        this.compilers.set(key, compiler);
+        return compiler;
+    }
+    else{
+        console.log("Compiler with key: " + key + " is already initialized");
+        return("Compiler with key: " + key + " is already initialized");
+    }
   }
 
   getCompiler(key: string) {

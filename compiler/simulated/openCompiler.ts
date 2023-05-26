@@ -20,7 +20,7 @@ export default class OpenCompiler {
     constructor() {
         this.initialized = false;
         this.key = "";
-        this.language = ""
+        this.language = "";
         this.prompt;
         this.tools;
         this.chain;
@@ -36,6 +36,7 @@ export default class OpenCompiler {
             this.prompt = this.getPromptData(this.language);
             this.memory = await this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
             this.chain = this.constructChain(this.prompt, this.model, this.memory);
+            this.initialized = true;
             console.log("Initalization complete");
         }
     }
@@ -47,7 +48,7 @@ export default class OpenCompiler {
 
     getPromptData = (language: string) => {
         return (
-            PromptTemplate.fromTemplate("You are a" + language + `Compiler. Compile {code} and return the output. 
+            PromptTemplate.fromTemplate("You are a " + language + ` Compiler. Compile {code} and return the output. 
             If there are any errors in the code, syntax or runtime, return the error exactly as a real compiler would. Make sure to compile the code in` + language)
         )
     }
@@ -58,12 +59,14 @@ export default class OpenCompiler {
     }
 
     compile = async (input: any) => {
-        if (this.chain !== undefined) {
-            console.log(input);
-            const res = await this.chain.call({ code: input });
-            console.log(res);
-            return res;
-        } else {
+        try { 
+            if(this.chain !== undefined) {
+                console.log(input);
+                const res = await this.chain.call({ code: input });
+                console.log(res);
+                return res;
+            }
+        } catch {
             return ("Could not compile, compiler is not initialized")
         }
     }
