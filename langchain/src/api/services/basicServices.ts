@@ -1,5 +1,5 @@
 import Agent from "../../agent/agent";
-import { run } from "../../agent/custom_agent"
+import { run } from "../../agent/agent_simple"
 class BasicAgentService {
   agents = new Map();
 

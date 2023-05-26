@@ -8,8 +8,9 @@ import {
   HumanMessagePromptTemplate,
 } from "langchain/prompts";
 
-const compile = () => {
+const compile = async (code: string) => {
     const url = "http://localhost:3000/api/v1/openCompiler";
+    const key = "2";
 
     try {
       const response = await fetch(url, {
@@ -18,7 +19,8 @@ const compile = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          "key": key
+          "key": key, 
+          "code": code
         }),
       })
       return response.json();
@@ -35,13 +37,13 @@ export const run = async () => {
             name: "Compiler",
             description:
               "call this to run your code",
-            func: async () => ,
+            func: async (code) => compile(code),
           }),
     ]
 
   const prompt = ZeroShotAgent.createPrompt(tools, {
-    prefix: `Answer the following questions as best you can, but speaking as a pirate might speak. You have access to the following tools:`,
-    suffix: `Begin! Remember to speak as a pirate when giving your final answer. Use lots of "Args"`,
+    prefix: `You are a programmer. You have access to a compiler, which can run your code:`,
+    suffix: `Begin!`,
   });
 
   const chatPrompt = ChatPromptTemplate.fromPromptMessages([
@@ -67,7 +69,7 @@ export const run = async () => {
   const executor = AgentExecutor.fromAgentAndTools({ agent, tools });
 
   const response = await executor.run(
-    "What is the value of foo?"
+    `Wite python code that will print "cheese wheels" and respond with the output`
   );
 
   console.log(response);
