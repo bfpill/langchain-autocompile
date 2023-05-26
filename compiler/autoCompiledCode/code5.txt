@@ -1,1 +1,6 @@
-movies = ["The Godfather", "Forrest Gump", "The Shawshank Redemption", "The Dark Knight", "Fight Club"]
+```python
+movies = ["The Godfather", "Pulp Fiction", "The Shawshank Redemption", "The Dark Knight", "Forrest Gump"]
+movies.sort()
+movies.reverse()
+print(movies)
+```

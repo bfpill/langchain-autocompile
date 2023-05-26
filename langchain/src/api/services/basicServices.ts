@@ -32,7 +32,7 @@ class BasicAgentService {
 
   async run() {
     try{
-        const output = run();
+        const output = await run();
         return output;
     } catch(error){
         console.log(error)
