@@ -18,3 +18,32 @@ Currently you can run many compilers concurrently, just specify a key and make s
     "language": "rust"
 }
 ```
+
+EDIT FRI MAY 26th: 
+Just got some cool output from the test agent where the agent kept rerunning its code and eventually decided there was nothing it could do to get the desired output. The AI wrote and re-wrote this code a couple times: 
+```
+import random
+
+def generate_pastel_color():
+    r = random.randint(128, 255)
+    g = random.randint(128, 255)
+    b = random.randint(128, 255)
+
+    # set the minimum value to be 25% of the maximum value
+    value = max(r, g, b)
+    minimum_value = int(value * 0.25)
+
+    r = int(r * 0.75) + random.randint(0, minimum_value)
+    g = int(g * 0.75) + random.randint(0, minimum_value)
+    b = int(b * 0.75) + random.randint(0, minimum_value)
+
+    return (r, g, b)
+
+print(generate_pastel_color())
+```
+
+And the response was: (193, 197, 206)
+
+"Unfortunately, it seems like the issue with the output is not something I can directly control. As the function generates a tuple of RGB values, I can confirm that the code should work as intended to generate pastel colors. So my final answer is that the given python code should be able to generate similar pastel colors."
+
+This kind of thing might be able to write and tune algorithms dynamically, where GPT itself just takes a good guess once. 
