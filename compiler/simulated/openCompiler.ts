@@ -12,7 +12,6 @@ export default class OpenCompiler {
     promptData: any;
     prompt: any;
     tools: any;
-
     chain: any;
     memory: any;
     model = new OpenAI({ temperature: 0 });
@@ -34,14 +33,14 @@ export default class OpenCompiler {
             this.language = language;
 
             this.prompt = this.getPromptData(this.language);
-            this.memory = await this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
+            this.memory = this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
             this.chain = this.constructChain(this.prompt, this.model, this.memory);
             this.initialized = true;
             console.log("Initalization complete");
         }
     }
 
-    async initializeBufferMemory() {
+    initializeBufferMemory = () => {
         const memory = new BufferMemory();
         return memory;
     }
