@@ -3,9 +3,9 @@ import openCompiler from "../../simulated/openCompiler";
 class CompilerService {
   compilers = new Map();
 
-  init(key: string) {
+  init(key: string, language: string) {
     const compiler = new openCompiler();
-    compiler.init(key);
+    compiler.init(key, language);
     this.compilers.set(key, compiler);
     return compiler;
   }
