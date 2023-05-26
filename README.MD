@@ -6,6 +6,6 @@ The compiler we're using here isn't a traditional compiler. It's a simulated com
 
 As it stands, the tool provides endpoints for running a single file's worth of code. You send your code to the endpoint, and it gets compiled. Simple as that.
 
-Im planning to add support for interacting with a terminal through the tool. This will allow the LLM to create multiple files and run commands, giving it some freedom.
+I'm planning to add support for interacting with a terminal through the tool. This will allow the LLM to create multiple files and run commands, giving it some freedom.
 
 Currently, there are two servers that need to be run to get this thing going, the agent that under /langchain that is used for testing the tool, and the OpenCompiler. Just fork and start the servers with 'run dev' in both the langchain and compiler ~monorepos. You should also be able to run the open-compiler tool on your own machine and then use the endpoints in a langchain tool or build it into a GPT plugin. 
