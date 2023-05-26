@@ -8,11 +8,33 @@ import {
   HumanMessagePromptTemplate,
 } from "langchain/prompts";
 
-const compile = async (code: string) => {
-    const url = "http://localhost:3000/api/v1/openCompiler";
-    const key = "2";
+import path from 'path';
+import fs from 'fs';
+import express from 'express';
+import { fileURLToPath } from 'url';
 
-    console.log("Attemping to compile: " + code)
+const port = 8000;
+const app = express();
+
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
+
+const compile = async (code: string) => {
+    const key = "5";
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename)
+
+    const filePath = path.join(__dirname + '/code/code' + key + '.txt');
+    console.log(code);
+    fs.writeFileSync(filePath, code, 'utf8');
+
+    app.use(express.static('code'));
+
+    console.log("Attemping to compile from:  " + filePath)
+
+    const url = "http://localhost:3000/api/v1/openCompiler";
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -21,7 +43,7 @@ const compile = async (code: string) => {
         },
         body: JSON.stringify({
           "key": key, 
-          "code": code
+          "codePath": filePath
         }),
       })
       return response.json();
@@ -37,8 +59,8 @@ export const run = async () => {
         new DynamicTool({
             name: "Compiler",
             description:
-              "call this to run your code",
-            func: async (code) => compile(code),
+              "Use to compile your code",
+            func: async (code) => await compile(code),
           }),
     ]
 
@@ -70,8 +92,8 @@ export const run = async () => {
   const executor = AgentExecutor.fromAgentAndTools({ agent, tools });
 
   const response = await executor.run(
-    `Write python code that will make two number variables and then print their sum. 
-    Format your code to be one linie. Run your code using the compiler tool and respond with your output.`
+    `Write python code prints "UGLY DUCKLING" 5 times using a for loop.
+    Format your code to be one line, and then run your code using the compiler tool. Wait for the compilers output and then send the output.`
   );
 
   console.log(response);

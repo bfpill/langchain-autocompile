@@ -1,0 +1,1 @@
+`python -c "for i in range(5): print('UGLY DUCKLING')"`
