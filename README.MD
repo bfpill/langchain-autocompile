@@ -42,7 +42,7 @@ def generate_pastel_color():
 print(generate_pastel_color())
 ```
 
-And the response was: (193, 197, 206)
+And the response was always along the lines of: (193, 197, 206)
 
 "Unfortunately, it seems like the issue with the output is not something I can directly control. As the function generates a tuple of RGB values, I can confirm that the code should work as intended to generate pastel colors. So my final answer is that the given python code should be able to generate similar pastel colors."
 
