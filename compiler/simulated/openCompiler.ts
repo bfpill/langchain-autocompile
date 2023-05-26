@@ -13,7 +13,7 @@ export default class OpenCompiler {
     prompt: any;
     tools: any;
     chain: any;
-    memory: any;
+    //memory: any;
     model = new OpenAI({ temperature: 0 });
 
     constructor() {
@@ -23,7 +23,7 @@ export default class OpenCompiler {
         this.prompt;
         this.tools;
         this.chain;
-        this.memory;
+        //this.memory;
     }
 
     async init(key: string, language: string) {
@@ -33,8 +33,8 @@ export default class OpenCompiler {
             this.language = language;
 
             this.prompt = this.getPromptData(this.language);
-            this.memory = this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
-            this.chain = this.constructChain(this.prompt, this.model, this.memory);
+            //this.memory = this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
+            this.chain = this.constructChain(this.prompt, this.model);
             this.initialized = true;
             console.log("Initalization complete");
         }
@@ -47,13 +47,16 @@ export default class OpenCompiler {
 
     getPromptData = (language: string) => {
         return (
-            PromptTemplate.fromTemplate("You are a " + language + ` Compiler. Compile {code} and return the output. 
-            If there are any errors in the code, syntax or runtime, return the error exactly as a real compiler would. Make sure to compile the code in` + language)
+            PromptTemplate.fromTemplate(`You are a highly accurate simulation of a ` + language + ` executor. Please run the following code in ` + language + `and output the result, be at an error or output. 
+            Here is the code: 
+                {code}
+            
+            `)
         )
     }
 
-    constructChain = (prompt: PromptTemplate, model: BaseLanguageModel, memory: any) => {
-        const chain = new ConversationChain({ prompt, llm: model, memory: memory });
+    constructChain = (prompt: PromptTemplate, model: BaseLanguageModel) => {
+        const chain = new ConversationChain({ prompt, llm: model });
         return chain;
     }
 
@@ -62,7 +65,6 @@ export default class OpenCompiler {
             if(this.chain !== undefined) {
                 console.log(input);
                 const res = await this.chain.call({ code: input });
-                console.log(res);
                 return res;
             }
         } catch {

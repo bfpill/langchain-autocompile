@@ -31,16 +31,13 @@ class CompilerService {
 
     const relPath = './autoCompiledCode/code' + key + '.txt'
     const absolutePath = path.resolve(relPath);
-    fs.writeFile(absolutePath, code, 'utf8', (err) => {
-      if (err) throw err;
-      console.log('The file has been saved!');
-    });
+    fs.writeFileSync(absolutePath, code, 'utf8') 
+    console.log('The file has been saved!');
 
     const data = fs.readFileSync(absolutePath, 'utf8');
-    console.log(data);
 
-    const output = compiler.compile(data);
-    console.log("Output from compiler: " + output)
+    const output = await compiler.compile(data);
+    console.log("Output from compiler: " + output.response)
     return output;
   }
 }
