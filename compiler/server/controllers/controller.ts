@@ -1,51 +1,26 @@
-import openCompilerServices from "../services/services"
+import CompilerService from "../services/CompilerService"
 
-const initCompiler = async (req, res) => {
-    const { body } = req;
-
-    if (
-        !body.key
-    ) {
-        res
-            .status(400)
-            .send({
-                status: "FAILED",
-                data: {
-                    error:
-                        "Error occurred because you failed to provide a compiler key"
-                },
-            });
-        return;
-    }
-
-    const key = body.key;
-    const result = await openCompilerServices.init(key);
-    res.send({ status: "OK", data: result });
-}
+const init = async (req, res) => {
+  const { key } = req.body;
+  try {
+    const compiler = CompilerService.init(key);
+    res.status(200).json({ message: 'Compiler initialized successfully', compiler });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Failed to initialize compiler', error: error.message });
+  }
+};
 
 const compile = async (req, res) => {
-    const { body } = req;
-
-    if (
-        !body.input
-    ) {
-        res
-            .status(400)
-            .send({
-                status: "FAILED",
-                data: {
-                    error:
-                        "Error occurred because you failed to provide an input to compile"
-                },
-            });
-        return;
-    }
-
-    const input = body.input;
-    const output = await openCompilerServices.compile(input);
-    res.send({ status: "OK", data: output });
-}
+  const { key, input } = req.body;
+  try {
+    const output = await CompilerService.compile(key, input);
+    res.status(200).json({ message: 'Compilation completed', output });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Compilation failed', error: error.message });
+  }
+};
 
 export default {
-    initCompiler, compile
+  init,
+  compile,
 };
