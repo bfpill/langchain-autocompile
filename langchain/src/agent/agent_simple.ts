@@ -10,16 +10,8 @@ import {
 
 import path from 'path';
 import fs from 'fs';
-import express from 'express';
 import { fileURLToPath } from 'url';
 import { AgentAction, AgentFinish } from "langchain/schema";
-
-const port = 8000;
-const app = express();
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
 
 const compile = async (code: string) => {
     const key = "5";
@@ -30,8 +22,6 @@ const compile = async (code: string) => {
     const filePath = path.join(__dirname + '/code/code' + key + '.txt');
     console.log(code);
     fs.writeFileSync(filePath, code, 'utf8');
-
-    app.use(express.static('code'));
 
     console.log("Attemping to compile from:  " + filePath)
 

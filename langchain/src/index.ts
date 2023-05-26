@@ -1,5 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import * as dotenv from 'dotenv';
+
+// Get environment variables
+dotenv.config() 
 
 // Import routes
 import routes from "./api/v1/routes/routes"

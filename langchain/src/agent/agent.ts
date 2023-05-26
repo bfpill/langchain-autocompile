@@ -170,7 +170,6 @@ export default class Clone {
         this.personalityPrompt;
         this.tools;
         this.chain;
-        // this.chatHistory;
         this.memory;
         this.chatPrompt;
         this.agent;
@@ -183,9 +182,8 @@ export default class Clone {
             console.log("Not initialized, running initalization");
             this.key = key;
 
-            this.tools = await this.initializeTools();
-            this.personalityPrompt = await this.initializePrompt(this.tools);
-            //this.chatHistory = await this.initializeChatHistory();
+            this.tools = this.initializeTools();
+            this.personalityPrompt = this.initializePrompt(this.tools);
             this.memory = await this.initializeMemory();  //motorhead / buffer.. switch between for testing
             this.chain = await this.constructChain(this.personalityPrompt);
             this.agent = await this.initializeAgent(this.chain);
@@ -218,14 +216,11 @@ export default class Clone {
         return tools;
     }
 
-    async initializeChatHistory() {
-
-    }
     // Define the initializeMemory method, which creates a new BufferMemory
     async initializeMemory() {
         const memory = new BufferMemory({
             returnMessages: true,
-            memoryKey: "chat_history",
+            memoryKey: "chat_history", //
             inputKey: "human_input",
             outputKey: 'Final Answer:',
         });
