@@ -33,24 +33,23 @@ export default class OpenCompiler {
             this.language = language;
 
             this.prompt = this.getPromptData(this.language);
-            //this.memory = this.initializeBufferMemory();  //motorhead / buffer.. switch between for testing
+            //this.memory = this.initializeMotorheadMemory();  //motorhead / buffer.. switch between for testing
             this.chain = this.constructChain(this.prompt, this.model);
             this.initialized = true;
-            console.log("Initalization complete");
+            console.log("Initalization of compiler {key: "+ key + " , language: " + language + "} complete");
         }
     }
 
-    initializeBufferMemory = () => {
+    initializeMotorheadMemory= () => {
         const memory = new BufferMemory();
         return memory;
     }
 
     getPromptData = (language: string) => {
         return (
-            PromptTemplate.fromTemplate(`You are a highly accurate simulation of a ` + language + ` executor. Please run the following code in ` + language + `and output the result, be at an error or output. 
+            PromptTemplate.fromTemplate(`You are a highly accurate simulation of a ` + language + ` executor. Please run the following code in ` + language + `and output the result, be it an error or output. 
             Here is the code: 
                 {code}
-            
             `)
         )
     }

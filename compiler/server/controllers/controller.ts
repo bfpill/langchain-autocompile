@@ -16,7 +16,7 @@ const compile = async (req, res) => {
 
   try {
     const output = await CompilerService.compile(key, codePath);
-    res.status(200).json({ message: 'Compilation comp aleted', output });
+    res.status(200).json({ message: 'Compilation completed: ', output });
   } catch (error: any) {
     res.status(500).json({ message: 'Compilation failed', error: error.message });
   }

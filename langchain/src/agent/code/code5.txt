@@ -1,6 +1,2 @@
-```python
-movies = ["The Godfather", "Pulp Fiction", "The Shawshank Redemption", "The Dark Knight", "Forrest Gump"]
-movies.sort()
-movies.reverse()
-print(movies)
-```
+movies = ['Avengers', 'Captain America', 'Thor', 'Iron Man']
+print('\n'.join(sorted(movies, reverse=True)))

@@ -16,5 +16,8 @@ app.use(bodyParser.json());
 app.use("/api/v1/openCompiler", openCompileRouter);
 
 app.listen(PORT, () => {
-  console.log(`API is listening on port ${PORT}`);
+  console.log(
+   `Welcome to OpenCompiler v1.0
+    Connected to server...`
+    );
 });

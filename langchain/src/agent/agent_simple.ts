@@ -1,7 +1,7 @@
 import { LLMChain } from "langchain/chains";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { ZeroShotAgent, AgentExecutor, AgentActionOutputParser } from "langchain/agents";
-import { DynamicTool, SerpAPI } from "langchain/tools";
+import { DynamicTool } from "langchain/tools";
 import {
   ChatPromptTemplate,
   SystemMessagePromptTemplate,
@@ -38,7 +38,7 @@ const compile = async (code: string) => {
         }),
       })
       const out = await response.json();
-      console.log("Got output" + out)
+      console.log("Got output" + out.output)
       return out;
     }
     catch (error) {
@@ -78,7 +78,7 @@ export const run = async () => {
         new DynamicTool({
             name: "Compiler",
             description:
-              "You can use this to compile your code.",
+              "You must use this compiler to execute your code.",
             func: async (code) => await compile(code),
           }),
     ]
@@ -113,7 +113,7 @@ export const run = async () => {
 
   const response = await executor.run(
     `Write python code that sorts a list of movies alphabetically and then prints the movies in reverse order"
-    Run your code using the compiler tool. 
+    ALWAYS Run your code using the compiler tool.
     If the output is not want you want / expected, rewrite your code and compile again.
     Once the compiled code is correct, send the compilers output.`
   );
