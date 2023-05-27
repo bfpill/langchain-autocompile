@@ -1,19 +1,7 @@
-I will use the following code:
-
 ```
-import math
+total = 0
+for i in range(12, 24):
+    total += i
 
-# Define gravitational constant
-G = 6.6743e-11
-
-# Define masses and distance between objects
-mass1 = 5000
-mass2 = 10000
-distance = 100
-
-# Calculate gravitational force
-force = G * mass1 * mass2 / math.pow(distance, 2)
-
-# Print the result
-print("Gravitational force:", force)
+print(total)
 ```

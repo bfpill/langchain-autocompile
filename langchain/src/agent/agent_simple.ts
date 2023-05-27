@@ -1,11 +1,8 @@
 import { LLMChain } from "langchain/chains";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { ZeroShotAgent, AgentExecutor, AgentActionOutputParser, LLMSingleActionAgent } from "langchain/agents";
+import { ZeroShotAgent, AgentExecutor, AgentActionOutputParser, LLMSingleActionAgent, BaseSingleActionAgent } from "langchain/agents";
 import { DynamicTool, Tool } from "langchain/tools";
 import {
-  ChatPromptTemplate,
-  SystemMessagePromptTemplate,
-  HumanMessagePromptTemplate,
   BaseChatPromptTemplate,
   BasePromptTemplate,
   SerializedBasePromptTemplate,
@@ -18,36 +15,36 @@ import { fileURLToPath } from 'url';
 import { AgentAction, AgentFinish, AgentStep, BaseChatMessage, HumanChatMessage, InputValues, PartialValues } from "langchain/schema";
 
 const compile = async (code: string) => {
-    const key = "5";
+  const key = "5";
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename)
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename)
 
-    const filePath = path.join(__dirname + '/code/code' + key + '.txt');
-    console.log(code);
-    fs.writeFileSync(filePath, code, 'utf8');
+  const filePath = path.join(__dirname + '/code/code' + key + '.txt');
+  console.log(code);
+  fs.writeFileSync(filePath, code, 'utf8');
 
-    console.log("Attemping to compile from:  " + filePath)
+  console.log("Attemping to compile from:  " + filePath)
 
-    const url = "http://localhost:3000/api/v1/openCompiler";
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          "key": key, 
-          "codePath": filePath
-        }),
-      })
-      const res = await response.json();
-      console.log("Got output" + res.output)
-      return res.output;
-    }
-    catch (error) {
-      return ("Could not connect to server")
-    }
+  const url = "http://localhost:3000/api/v1/openCompiler";
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "key": key,
+        "codePath": filePath
+      }),
+    })
+    const res = await response.json();
+    console.log("Got output" + res.output)
+    return res.output;
+  }
+  catch (error) {
+    return ("Could not connect to server")
+  }
 }
 
 const PREFIX = `You are a programmer. You only have access to a compiler tool, which you must use to compile your code. You can ONLY use the provided compiler. 
@@ -117,65 +114,99 @@ class CustomPromptTemplate extends BaseChatPromptTemplate {
 }
 
 class CustomOutputParser extends AgentActionOutputParser {
-    async parse(text: string): Promise<AgentAction | AgentFinish> {
+  async parse(text: string): Promise<AgentAction | AgentFinish> {
+    console.log(text);
+    if (text.includes("Final Answer:")) {
+      const parts = text.split("Final Answer:");
+      const input = parts[parts.length - 1].trim();
+      const finalAnswers = { output: input };
       console.log(text);
-      if (text.includes("Final Answer:")) {
-        const parts = text.split("Final Answer:");
-        const input = parts[parts.length - 1].trim();
-        const finalAnswers = { output: input };
-        console.log(text);
-        return { log: text, returnValues: finalAnswers };
-      }
-  
-      const match = /Action: (.*)\nAction Input:(.*)/s.exec(text);
-      if (!match) {
-        throw new Error(`Could not parse LLM output: ${text}`);
-      }
-  
-      return {
-        tool: match[1].trim(),
-        toolInput: match[2].trim().replace(/^"+|"+$/g, ""),
-        log: text,
-      };
+      return { log: text, returnValues: finalAnswers };
     }
-  
-    getFormatInstructions(): string {
-      throw new Error("Not implemented");
+
+    const match = /Action: (.*)\nAction Input:(.*)/s.exec(text);
+    if (!match) {
+      throw new Error(`Could not parse LLM output: ${text}`);
     }
+
+    return {
+      tool: match[1].trim(),
+      toolInput: match[2].trim().replace(/^"+|"+$/g, ""),
+      log: text,
+    };
   }
 
-export const run = async () => {
+  getFormatInstructions(): string {
+    throw new Error("Not implemented");
+  }
+}
+
+export default class Agent {
+  key: string;
+  tools: Tool[];
+  prompt: BaseChatPromptTemplate;
+  chain: LLMChain;
+  agent: BaseSingleActionAgent;
+  executor: AgentExecutor;
+
+  constructor(key: string) {
+    this.key = key;
+    this.tools = this.createTools();
+    this.prompt = this.createPrompt(this.tools);
+    this.chain = this.createChain(this.prompt);
+    this.agent = this.createAgent(this.chain);
+    this.executor = this.createExecutor(this.agent, this.tools);
+  }
+
+  createTools = () => {
     const tools = [
-        new DynamicTool({
-            name: "Compiler",
-            description:
-              "You must use this compiler to execute your code.",
-            func: async (code) => await compile(code),
-          }),
+      new DynamicTool({
+        name: "Compiler",
+        description:
+          "You must use this compiler to execute your code.",
+        func: async (code) => await compile(code),
+      }),
     ]
+    return tools;
+  }
 
-  const prompt = new CustomPromptTemplate({
-    tools,
-    inputVariables: ["input", "agent_scratchpad"],
-  })
+  createPrompt = (tools: Tool[]) => {
+    const prompt = new CustomPromptTemplate({
+      tools,
+      inputVariables: ["input", "agent_scratchpad"],
+    })
+    return prompt;
+  }
 
-  const chat = new ChatOpenAI({});
+  createChain = (prompt: BasePromptTemplate) => {
+    const chat = new ChatOpenAI({});
 
-  const llmChain = new LLMChain({
-    prompt: prompt,
-    llm: chat,
-  });
+    const llmChain = new LLMChain({
+      prompt: prompt,
+      llm: chat,
+    });
 
-  const agent = new LLMSingleActionAgent({
-    outputParser : new CustomOutputParser(),
-    llmChain,
-    stop: ["\nObservation"],
-  });
+    return llmChain;
+  }
 
-  const executor = AgentExecutor.fromAgentAndTools({ agent, tools });
+  createAgent = (llmChain: LLMChain<string>) => {
+    const agent = new LLMSingleActionAgent({
+      outputParser: new CustomOutputParser(),
+      llmChain,
+      stop: ["\nObservation"],
+    });
 
-  const input =  `Write a one file python program that simulates gravity"`;
-  const response = await executor.call({input});
+    return agent;
+  }
 
-  console.log(response);
+  createExecutor = (agent: BaseSingleActionAgent, tools: Tool[]) => {
+    const executor = AgentExecutor.fromAgentAndTools({ agent, tools });
+    return executor;
+  }
+
+  run = async (input: string) => {
+    const response = await this.executor.call({ input });
+    console.log(response);
+    return response;
+  }
 };
