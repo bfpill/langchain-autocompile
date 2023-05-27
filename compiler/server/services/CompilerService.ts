@@ -1,7 +1,6 @@
 import openCompiler from "../../simulated/openCompiler";
 import fs from 'fs';
 import path from 'path';
-import http from 'http';
 
 class CompilerService {
   compilers = new Map();
