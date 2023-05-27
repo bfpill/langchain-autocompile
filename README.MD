@@ -1,4 +1,4 @@
-# Langchain / ChatGPT Compiler Plugin
+# Langchain LLM compiler playground
 
 Welcome to the Langchain / ChatGPT Compiler Plugin project. This tool is designed to bridge the gap between the Language Learning Model (LLM) and the world of code compilation. It's a simple, yet effective tool that allows the LLM to interact with a compiler and compile their own code.
 
