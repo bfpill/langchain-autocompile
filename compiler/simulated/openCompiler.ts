@@ -55,7 +55,8 @@ export default class OpenCompiler {
 
     getPromptData = (language: string) => {
         return (
-            PromptTemplate.fromTemplate(`You are a highly accurate simulation of a ` + language + ` executor. Please run the following code in ` + language + `and output the result, be it an error or output. 
+            PromptTemplate.fromTemplate(`You are a highly accurate simulation of a ` + language + ` executor. Please run the following code in 
+            ` + language + `and output the result exactly as a ` + language + ` compiler would with no other text whatsoever'
             Here is the code: 
                 {code}
             `)

@@ -41,17 +41,18 @@ const compile = async (code: string) => {
           "codePath": filePath
         }),
       })
-      const out = await response.json();
-      console.log("Got output" + out.output)
-      return out;
+      const res = await response.json();
+      console.log("Got output" + res.output)
+      return res.output;
     }
     catch (error) {
       return ("Could not connect to server")
     }
 }
 
-const PREFIX = `You are a programmer. You have access to a compiler tool, which you must use to compile your code. You can ONLY use the provided compiler. 
+const PREFIX = `You are a programmer. You only have access to a compiler tool, which you must use to compile your code. You can ONLY use the provided compiler. 
 ALWAYS run your code using the compiler tool.
+You have all neccessary packages installed already. 
 If the output is not want you want / expected, rewrite your code and compile again.
 Once the compiled code is correct, send the compilers output.`;
 const formatInstructions = (
@@ -60,7 +61,7 @@ const formatInstructions = (
 
 Question: The code you have been asked to write
 Thought: you should always think about what to do
-Action: use the [Compiler] tool to compile your code.
+Action: the action to take, should be one of [${toolNames}]
 Action Input: the code you want to compile
 Observation: the result of running your code
 ... (this Thought/Action/Action Input/Observation can repeat N times)
@@ -173,7 +174,7 @@ export const run = async () => {
 
   const executor = AgentExecutor.fromAgentAndTools({ agent, tools });
 
-  const input =  `Write python code that sorts a list of movies alphabetically and then prints the movies in reverse order"`;
+  const input =  `Write a one file python program that simulates gravity"`;
   const response = await executor.call({input});
 
   console.log(response);
