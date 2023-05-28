@@ -1,7 +1,6 @@
 ```
 total = 0
-for i in range(12, 24):
-    total += i
-
+for num in range(12, 24):
+    total += num
 print(total)
 ```

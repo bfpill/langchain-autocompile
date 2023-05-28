@@ -23,7 +23,7 @@ class BasicAgentService {
         return output;
     } catch(error){
         console.log(error)
-        return(`Compiler not found for key: ${key}`)
+        return(`Agent not found for key: ${key}`)
     }
   }
 }

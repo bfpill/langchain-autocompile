@@ -74,7 +74,6 @@ export default class OpenCompiler {
     compile = async (input: string) => {
         try { 
             if(this.chain !== undefined) {
-                console.log(input);
                 const res = await this.chain.call({ code: input });
                 console.log(res);
                 return res;

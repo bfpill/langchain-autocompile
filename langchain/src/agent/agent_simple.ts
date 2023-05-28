@@ -13,28 +13,30 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { AgentAction, AgentFinish, AgentStep, BaseChatMessage, HumanChatMessage, InputValues, PartialValues } from "langchain/schema";
+import chalk from 'chalk';
 
-const compile = async (code: string) => {
-  const key = "5";
 
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename)
-
-  const filePath = path.join(__dirname + '/code/code' + key + '.txt');
-  console.log(code);
-  fs.writeFileSync(filePath, code, 'utf8');
-
-  console.log("Attemping to compile from:  " + filePath)
-
-  const url = "http://localhost:3000/api/v1/openCompiler";
+const compile = async (agentInput) => {
   try {
+    const { key, code } = extractKeyCode(agentInput);
+    console.log(key + " : " + code);
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename)
+
+    const filePath = path.join(__dirname + '/code/code' + key + '.txt');
+    console.log(code);
+    fs.writeFileSync(filePath, code, 'utf8');
+
+    console.log("Attemping to compile from:  " + filePath)
+
+    const url = "http://localhost:3000/api/v1/openCompiler";
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        "key": key,
         "codePath": filePath
       }),
     })
@@ -47,7 +49,60 @@ const compile = async (code: string) => {
   }
 }
 
-const PREFIX = `You are a programmer. You only have access to a compiler tool, which you must use to compile your code. You can ONLY use the provided compiler. 
+const initializeCompiler = async (agentInput) => {
+  try {
+    const { key, language } = extractKeyLanguage(agentInput);
+    console.log(key + " : " + language);
+    const url = "http://localhost:3000/api/v1/openCompiler";
+
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "key": key,
+        "language": language
+      }),
+    })
+    const res = await response.json();
+    return res.message;
+  }
+  catch (error) {
+    return ("Could not initialize compiler. Check your input format and try again.")
+  }
+}
+
+const extractKeyCode = (input: string): { key: string, code: string } => {
+  const regex = /key:\s*(.*?),\s*code:\s*([\s\S]*)/;
+  const match = input.match(regex);
+
+  if (match) {
+    const key = match[1].trim();
+    const code = match[3].trim();
+
+    return { key, code };
+  } else {
+    throw Error('Invalid input format.');
+  }
+}
+
+const extractKeyLanguage = (input: string): { key: string, language: string } => {
+  const regex = /key:\s*(.*?),\s*language:\s*(.*)/;
+  const match = input.match(regex);
+
+  if (match) {
+    const key = match[1].trim();
+    const language = match[2].trim();
+
+    return { key, language };
+  } else {
+    throw Error('Invalid input format.');
+  }
+}
+
+const PREFIX = `You are a programmer. You have access to a compiler and a compiler initializer. 
+You must use the compiler to compile your code. You can ONLY use the provided compiler. 
 ALWAYS run your code using the compiler tool.
 You have all neccessary packages installed already. 
 If the output is not want you want / expected, rewrite your code and compile again.
@@ -58,8 +113,8 @@ const formatInstructions = (
 
 Question: The code you have been asked to write
 Thought: you should always think about what to do
-Action: the action to take, should be one of [${toolNames}]
-Action Input: the code you want to compile
+Action: the action to take, should be one of [Compiler], [CompilerInitializer]
+Action Input: the Action input the compiler or compilerInitializer takes
 Observation: the result of running your code
 ... (this Thought/Action/Action Input/Observation can repeat N times)
 Thought: I've gotten the correct output from the compiler
@@ -82,9 +137,11 @@ class CustomPromptTemplate extends BaseChatPromptTemplate {
   }
 
   async formatMessages(values: InputValues): Promise<BaseChatMessage[]> {
-    console.log(values);
+    if (values.intermediate_steps.length >= 1) {
+      console.log(chalk.blue(values.intermediate_steps[values.intermediate_steps.length - 1].action.toolInput + " : " + values.intermediate_steps[values.intermediate_steps.length - 1].observation));
+    }
     /** Construct the final template */
-    const toolStrings = this.tools
+    const toolStrings = this. tools
       .map((tool) => `${tool.name}: ${tool.description}`)
       .join("\n");
     const toolNames = this.tools.map((tool) => tool.name).join("\n");
@@ -163,8 +220,23 @@ export default class Agent {
       new DynamicTool({
         name: "Compiler",
         description:
-          "You must use this compiler to execute your code.",
-        func: async (code) => await compile(code),
+          `You must use this compiler to execute your code. 
+          
+          To use, format your Action input like so:
+          key: (key), code: (code)`,
+        func: async (agentInput) => await compile(agentInput),
+      }),
+      new DynamicTool({
+        name: "CompilerInitializer",
+        //be careful not to overlap with the customOutputParser when describing the tools!!
+        description:
+          `Use this to initialize a compiler with a key and a programming language you want it to use. 
+          
+          To use, format your Action input like so: 
+          key: (number), language: (language)
+          
+          Do NOT include your key or language in your Action, only your ActionInput`,
+        func: async (agentInput) => await initializeCompiler(agentInput),
       }),
     ]
     return tools;

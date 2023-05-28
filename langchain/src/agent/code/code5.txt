@@ -1,7 +1,1 @@
-```
-total = 0
-for i in range(12, 24):
-    total += i
-
-print(total)
-```
+(no input needed)
