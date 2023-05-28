@@ -27,13 +27,14 @@ export default class OpenCompiler {
 
     async init(key: string, language: string) {
         if (!this.initialized) {
+            
             console.log("Not initialized, running initalization");
             this.key = key;
             this.language = language;
 
             this.prompt = this.getPromptData(this.language);
             this.memory = this.initializeMotorheadMemory();  //motorhead / buffer.. switch between for testing
-            this.chain = this.constructChain(this.memory, this.prompt, this.model);
+            this.chain = this.constructChain(this.prompt, this.model);
             this.initialized = true;
             console.log("Initalization of compiler {key: "+ key + ",language: " + language + "} complete");
         }
@@ -59,24 +60,28 @@ export default class OpenCompiler {
         return (
             PromptTemplate.fromTemplate(`You are a highly accurate simulation of a ` + language + ` executor. Please run the following code in 
             ` + language + `and output the result exactly as a ` + language + ` compiler would with no other text whatsoever'
-            Here is the code you have been asked to run first: {chat_history}
             Here is the code: 
                 {code}
             `)
         )
     }
 
-    constructChain = (memory: any ,prompt: PromptTemplate, model: BaseLanguageModel) => {
-        const chain = new ConversationChain({ memory, prompt, llm: model });
+    constructChain = (prompt: PromptTemplate, model: BaseLanguageModel) => {
+        const chain = new ConversationChain({ prompt, llm: model });
         return chain;
     }
 
     compile = async (input: string) => {
         try { 
             if(this.chain !== undefined) {
-                const res = await this.chain.call({ code: input });
-                console.log(res);
-                return res;
+                try{
+                    const res = await this.chain.call({ code: input });
+                    console.log(res);
+                    return res;
+                }
+                catch(error){
+                    return(error)
+                }
             }
         } catch {
             return ("Could not compile, compiler is not initialized")
