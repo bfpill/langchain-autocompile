@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import chalk from 'chalk'
 import * as dotenv from 'dotenv';
 
 // Get environment variables
@@ -20,5 +21,5 @@ app.use('/langchain-autocompile/v1', routes);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+  console.log(chalk.yellow(`Agent server started on port ${PORT}`));
 });

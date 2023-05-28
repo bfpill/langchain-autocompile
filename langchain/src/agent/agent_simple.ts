@@ -1,6 +1,6 @@
 import { LLMChain } from "langchain/chains";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { ZeroShotAgent, AgentExecutor, AgentActionOutputParser, LLMSingleActionAgent, BaseSingleActionAgent } from "langchain/agents";
+import { AgentExecutor, AgentActionOutputParser, LLMSingleActionAgent, BaseSingleActionAgent } from "langchain/agents";
 import { DynamicTool, Tool } from "langchain/tools";
 import {
   BaseChatPromptTemplate,

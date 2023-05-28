@@ -2,7 +2,7 @@ import { OpenAI } from "langchain/llms/openai";
 import { PromptTemplate } from "langchain/prompts";
 import { ConversationChain } from "langchain/chains";
 import { BaseLanguageModel } from "langchain/dist/base_language";
-import { MotorheadMemory } from "langchain/memory";
+import { MotorheadMemory } from "langchain/memory"
   
 export default class OpenCompiler {
     initialized: boolean;
@@ -43,6 +43,8 @@ export default class OpenCompiler {
         const memory = new MotorheadMemory({
             sessionId: "user-id",
             motorheadURL: "localhost:8080",
+            returnMessages: true, 
+            memoryKey: "chat_history"
         });
         
         const context = memory.context
@@ -50,13 +52,14 @@ export default class OpenCompiler {
         Here's previous context: ${memory.context}`
           : "";
         
-        return memory;
+        return context;
     }
 
     getPromptData = (language: string) => {
         return (
             PromptTemplate.fromTemplate(`You are a highly accurate simulation of a ` + language + ` executor. Please run the following code in 
             ` + language + `and output the result exactly as a ` + language + ` compiler would with no other text whatsoever'
+            Here is the code you have been asked to run first: {chat_history}
             Here is the code: 
                 {code}
             `)
@@ -64,7 +67,7 @@ export default class OpenCompiler {
     }
 
     constructChain = (memory: any ,prompt: PromptTemplate, model: BaseLanguageModel) => {
-        const chain = new ConversationChain({ prompt, llm: model });
+        const chain = new ConversationChain({ memory, prompt, llm: model });
         return chain;
     }
 

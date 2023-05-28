@@ -1,4 +1,5 @@
 import Agent from "../../agent/agent_simple";
+
 class BasicAgentService {
   agents = new Map();
 

@@ -1,6 +1,8 @@
 import openCompiler from "../../simulated/openCompiler";
 import fs from 'fs';
 import path from 'path';
+import chalk from 'chalk'
+
 
 class CompilerService {
   compilers = new Map();
@@ -13,7 +15,7 @@ class CompilerService {
       return compiler;
     }
     else {
-      console.log("Compiler with key: " + key + " is already initialized");
+      console.log(chalk.blue("Compiler with key: " + key + " is already initialized"));
       return ("Compiler with key: " + key + " is already initialized");
     }
   }
@@ -23,10 +25,10 @@ class CompilerService {
   }
 
   async compile(key: string, codePath: string) {
-    console.log("Got request to compile from : " + codePath);
+    console.log(chalk.blue("Got request to compile from : " + codePath));
     const compiler = this.getCompiler(key);
     if (!compiler) {
-      throw new Error(`Compiler not found for key: ${key}`);
+      throw new Error(chalk.red(`Compiler not found for key: ${key}`));
     }
 
     const data = fs.readFileSync(codePath, 'utf8');
@@ -35,7 +37,7 @@ class CompilerService {
     const absolutePath = path.resolve(relPath);
 
     fs.writeFileSync(absolutePath, data, 'utf8');
-    console.log("Wrote to file: " + absolutePath)
+    console.log(chalk.green("Wrote to file: " + absolutePath));
     
     const code = fs.readFileSync(absolutePath, 'utf8');
 
