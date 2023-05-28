@@ -1,10 +1,10 @@
 import CompilerService from "../services/CompilerService"
 
 
-const init = async (req, res) => {
+const initializeCompiler = async (req, res) => {
   const { key, language } = req.body;
   try {
-    const compilerMessage = CompilerService.init(key, language);
+    const compilerMessage = CompilerService.initializeCompiler(key, language);
     res.status(200).json({ message: 'Compiler initialized successfully'});
   } catch (error: any) {
     res.status(500).json({ message: 'Failed to initialize compiler', error: error.message });
@@ -23,6 +23,6 @@ const compile = async (req, res) => {
 };
 
 export default {
-  init,
+  initializeCompiler,
   compile,
 };

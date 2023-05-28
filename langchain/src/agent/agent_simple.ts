@@ -37,6 +37,7 @@ const compile = async (agentInput) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        "key": key,
         "codePath": filePath
       }),
     })
@@ -79,7 +80,7 @@ const extractKeyCode = (input: string): { key: string, code: string } => {
 
   if (match) {
     const key = match[1].trim();
-    const code = match[3].trim();
+    const code = match[2].trim();
 
     return { key, code };
   } else {
@@ -218,21 +219,23 @@ export default class Agent {
   createTools = () => {
     const tools = [
       new DynamicTool({
-        name: "Compiler",
+        name: "[Compiler]",
         description:
           `You must use this compiler to execute your code. 
           
           To use, format your Action input like so:
-          key: (key), code: (code)`,
+          key: (key), code: (code)
+          
+          Do NOT include your key or code in your Action, only your ActionInput`,
         func: async (agentInput) => await compile(agentInput),
       }),
       new DynamicTool({
-        name: "CompilerInitializer",
+        name: "[CompilerInitializer]",
         //be careful not to overlap with the customOutputParser when describing the tools!!
         description:
           `Use this to initialize a compiler with a key and a programming language you want it to use. 
-          
-          To use, format your Action input like so: 
+          To use the tool, format your action to be just: [CompilerInitializer] and
+          Format your Action input only as: 
           key: (number), language: (language)
           
           Do NOT include your key or language in your Action, only your ActionInput`,

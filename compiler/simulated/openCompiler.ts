@@ -35,7 +35,7 @@ export default class OpenCompiler {
             this.memory = this.initializeMotorheadMemory();  //motorhead / buffer.. switch between for testing
             this.chain = this.constructChain(this.memory, this.prompt, this.model);
             this.initialized = true;
-            console.log("Initalization of compiler {key: "+ key + " , language: " + language + "} complete");
+            console.log("Initalization of compiler {key: "+ key + ",language: " + language + "} complete");
         }
     }
 
